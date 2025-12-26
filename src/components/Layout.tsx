@@ -68,7 +68,7 @@ export default function Layout({ children }: LayoutProps) {
               <div className="hidden sm:flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg">
                 <User className="w-4 h-4 text-gray-600" />
                 <span className="text-sm font-medium text-gray-700">
-                  {user?.name || user?.email}
+                  {user?.firstName || user?.email}
                 </span>
               </div>
 

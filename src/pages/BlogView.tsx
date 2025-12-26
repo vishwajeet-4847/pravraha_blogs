@@ -207,7 +207,7 @@ export default function BlogView() {
                   <p className="text-gray-700 mb-4">{blog.ctaDesc}</p>
                 )}
                 <a
-                  href={blog.ctaLink}
+                  href={`https://pravraha.com/${blog.ctaLink}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-block"
