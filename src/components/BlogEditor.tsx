@@ -31,7 +31,7 @@ export default function BlogEditor({ value, onChange }: BlogEditorProps) {
       [{ align: [] }],
 
       // Lists
-      [{ list: "ordered" }, { list: "bullet" }],
+      [{ list: "ordered" }, { list: "bullet" },{list:"check"}],
 
       // Indentation
       [{ indent: "-1" }, { indent: "+1" }],

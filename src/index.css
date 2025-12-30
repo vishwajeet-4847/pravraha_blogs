@@ -50,6 +50,24 @@ input, textarea, select, option {
   margin-top: 1.25em;
   margin-bottom: 1.25em;
   padding-left: 1.625em;
+  
+}
+.prose ul{
+  list-style-type: disc;
+}
+
+
+.prose ol li[data-list="bullet"]::marker {
+  content: "•  ";
+}
+.prose ol li[data-list="ordered"] {
+  list-style-type: decimal;
+}
+.prose ol li[data-list="check"]::marker {
+  content: "☐  ";
+}
+.prose ol li[data-list="checked"]::marker {
+  content: "☑  ";
 }
 
 .prose li {
