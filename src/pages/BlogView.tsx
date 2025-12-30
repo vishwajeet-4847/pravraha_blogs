@@ -139,7 +139,7 @@ export default function BlogView() {
       <div className="flex items-center justify-center gap-6 text-white/90">
         <div className="flex items-center gap-2">
           <User className="w-5 h-5" />
-          <span className="font-medium">{blog.author.name}</span>
+          <span className="font-medium">{blog?.author?.name}</span>
         </div>
 
         <div className="flex items-center gap-2">

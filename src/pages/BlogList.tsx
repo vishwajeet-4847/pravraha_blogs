@@ -210,7 +210,7 @@ export default function BlogList() {
                                         <div className="flex items-center gap-4 text-xs text-gray-500 mb-4 pb-4 border-b border-gray-200">
                                             <div className="flex items-center gap-1.5">
                                                 <User className="w-4 h-4" />
-                                                <span className="truncate">{blog.author.name}</span>
+                                                <span className="truncate">{blog?.author?.name}</span>
                                             </div>
                                             <div className="flex items-center gap-1.5">
                                                 <Calendar className="w-4 h-4" />
