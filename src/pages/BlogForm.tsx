@@ -406,7 +406,7 @@ export default function BlogForm({ blogId }: BlogFormProps) {
                                             placeholder="SEO meta description"
                                             maxLength={300}
                                         />
-                                        <p className="text-sm text-gray-500 mt-1">{formData.metaDescription.length}/300</p>
+                                        <p className="text-sm text-gray-500 mt-1">{formData?.metaDescription?.length}/300</p>
                                     </div>
 
                                     <div className="md:col-span-2">
@@ -422,7 +422,7 @@ export default function BlogForm({ blogId }: BlogFormProps) {
                                             placeholder="Brief summary of the blog"
                                             maxLength={500}
                                         />
-                                        <p className="text-sm text-gray-500 mt-1">{formData.excerpt.length}/500</p>
+                                        <p className="text-sm text-gray-500 mt-1">{formData?.excerpt?.length}/500</p>
                                     </div>
 
                                     <div>
@@ -518,7 +518,7 @@ export default function BlogForm({ blogId }: BlogFormProps) {
                                                 Add
                                             </Button>
                                         </div>
-                                        {formData.tags.length > 0 && (
+                                        {formData.tags && formData?.tags?.length > 0 && (
                                             <div className="flex flex-wrap gap-2 mt-3">
                                                 {formData.tags.map((tag) => (
                                                     <Badge key={tag} variant="primary">
@@ -551,7 +551,7 @@ export default function BlogForm({ blogId }: BlogFormProps) {
                                         <input
                                             type="text"
                                             required
-                                            value={formData.author.name}
+                                            value={formData.author?.name}
                                             onChange={(e) =>
                                                 setFormData({ ...formData, author: { ...formData.author, name: e.target.value } })
                                             }
@@ -567,7 +567,7 @@ export default function BlogForm({ blogId }: BlogFormProps) {
                                         <input
                                             type="url"
                                             required
-                                            value={formData.author.avatar}
+                                            value={formData.author?.avatar}
                                             onChange={(e) =>
                                                 setFormData({ ...formData, author: { ...formData.author, avatar: e.target.value } })
                                             }
@@ -579,7 +579,7 @@ export default function BlogForm({ blogId }: BlogFormProps) {
                                     <div className="md:col-span-2">
                                         <label className="block text-sm font-medium text-gray-700 mb-2">Author Bio</label>
                                         <textarea
-                                            value={formData.author.bio}
+                                            value={formData.author?.bio}
                                             onChange={(e) =>
                                                 setFormData({ ...formData, author: { ...formData.author, bio: e.target.value } })
                                             }
