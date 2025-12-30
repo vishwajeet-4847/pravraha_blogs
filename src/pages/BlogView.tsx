@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
-import { blogAPI, Blog } from '../utils/api';
+import { blogAPI, Blog, getImageUrl } from '../utils/api';
 import { ArrowLeft, Calendar, Tag, User, Loader2, Edit, Eye, EyeOff } from 'lucide-react';
 import Button from '../components/ui/Button';
 import Badge from '../components/ui/Badge';
@@ -114,7 +114,7 @@ export default function BlogView() {
           {/* Featured Image */}
        <div className="relative w-full h-96 overflow-hidden rounded-t-xl">
   <img
-    src={blog.image}
+    src={getImageUrl(blog.image)}
     alt={blog.title}
     className="w-full h-full object-cover"
   />

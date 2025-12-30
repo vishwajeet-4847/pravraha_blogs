@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
-import { blogAPI, Blog } from '../utils/api';
+import { blogAPI, Blog, getImageUrl } from '../utils/api';
 import {
     Search,
     Filter,
@@ -174,7 +174,7 @@ export default function BlogList() {
                                     {/* Image */}
                                     <div className="relative w-full h-48 overflow-hidden">
                                         <img
-                                            src={blog.image}
+                                            src={getImageUrl(blog.image)}
                                             alt={blog.title}
                                             className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
                                         />
@@ -247,7 +247,7 @@ export default function BlogList() {
                                                     <Edit className="w-4 h-4" />
                                                 </Button>
                                             </Link>
-                                            <button
+                                           {blog.isPublished && <button
                                                 onClick={() => handleTogglePublish(blog._id)}
                                                 disabled={toggling === blog._id}
                                                 className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50"
@@ -260,7 +260,7 @@ export default function BlogList() {
                                                 ) : (
                                                     <Eye className="w-4 h-4" />
                                                 )}
-                                            </button>
+                                            </button>}
                                             <button
                                                 onClick={() => handleDelete(blog._id)}
                                                 disabled={deleting === blog._id}

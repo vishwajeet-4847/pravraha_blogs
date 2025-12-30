@@ -1,7 +1,7 @@
 import { useState, useEffect, FormEvent } from 'react';
 import Layout from '../components/Layout';
-import { blogAPI, BlogFormData } from '../utils/api';
-import { Save, Loader2, ArrowLeft, Eye, FileText, Monitor, Edit2 } from 'lucide-react';
+import { blogAPI, BlogFormData, getImageUrl } from '../utils/api';
+import { Save, Loader2, ArrowLeft, Eye, FileText, Monitor, Edit2, Upload } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import BlogEditor from '../components/BlogEditor';
 import Card, { CardBody } from '../components/ui/Card';
@@ -39,6 +39,8 @@ export default function BlogForm({ blogId }: BlogFormProps) {
         isPublished: false,
     });
     const [tagInput, setTagInput] = useState('');
+    const [imageFile, setImageFile] = useState<File | null>(null);
+    const [imagePreview, setImagePreview] = useState<string>('');
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -70,6 +72,10 @@ export default function BlogForm({ blogId }: BlogFormProps) {
                     ctaButtonTitle: blog.ctaButtonTitle || '',
                     isPublished: blog.isPublished,
                 });
+                // Set image preview from existing image
+                if (blog.image) {
+                    setImagePreview(getImageUrl(blog.image));
+                }
             }
         } catch (error) {
             alert('Failed to fetch blog');
@@ -105,12 +111,36 @@ export default function BlogForm({ blogId }: BlogFormProps) {
         setFormData({ ...formData, tags: formData.tags.filter((t) => t !== tag) });
     };
 
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setImageFile(file);
+            // Create preview URL
+            const previewUrl = URL.createObjectURL(file);
+            setImagePreview(previewUrl);
+            // Update formData with file (will be sent as FormData)
+            setFormData({ ...formData, image: file });
+        }
+    };
+
+    const handleRemoveImage = () => {
+        setImageFile(null);
+        setImagePreview('');
+        // Clear image from formData
+        setFormData({ ...formData, image: '' });
+    };
+
     const handleSubmit = async (e: FormEvent, publish: boolean) => {
         e.preventDefault();
         setSaving(true);
 
         try {
-            const dataToSubmit = { ...formData, isPublished: publish };
+            const dataToSubmit = { 
+                ...formData, 
+                isPublished: publish,
+                // Use imageFile if available, otherwise use existing image string
+                image: imageFile || formData.image
+            };
 
             if (isEdit) {
                 await blogAPI.update(blogId!, dataToSubmit);
@@ -181,9 +211,9 @@ export default function BlogForm({ blogId }: BlogFormProps) {
                         <Card>
                             {/* Featured Image */}
                             <div className="relative w-full h-96 overflow-hidden rounded-t-xl">
-                                {formData.image ? (
+                                {imagePreview || formData.image ? (
                                     <img
-                                        src={formData.image}
+                                        src={imagePreview || getImageUrl(formData.image as string)}
                                         alt={formData.title || 'Blog Preview'}
                                         className="w-full h-full object-cover"
                                     />
@@ -424,23 +454,53 @@ export default function BlogForm({ blogId }: BlogFormProps) {
 
                                     <div className="md:col-span-2">
                                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            Featured Image URL <span className="text-red-500">*</span>
+                                            Featured Image <span className="text-red-500">*</span>
                                         </label>
-                                        <input
-                                            type="url"
-                                            required
-                                            value={formData.image}
-                                            onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                                            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                            placeholder="https://example.com/image.jpg"
-                                        />
-                                        {formData.image && (
-                                            <img
-                                                src={formData.image}
-                                                alt="Preview"
-                                                className="mt-3 w-full h-48 object-cover rounded-lg"
-                                            />
-                                        )}
+                                        <div className="space-y-3">
+                                            <div className="flex items-center gap-4">
+                                                <label className="flex-1 cursor-pointer">
+                                                    <input
+                                                        type="file"
+                                                        accept="image/*"
+                                                        onChange={handleImageChange}
+                                                        className="hidden"
+                                                        required={!isEdit && !imageFile && !formData.image}
+                                                    />
+                                                    <div className="flex items-center justify-center gap-2 px-4 py-2.5 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 transition-colors">
+                                                        <Upload className="w-5 h-5 text-gray-400" />
+                                                        <span className="text-gray-700">
+                                                            {imageFile 
+                                                                ? imageFile.name 
+                                                                : (formData.image && typeof formData.image === 'string')
+                                                                    ? 'Current image (click to change)'
+                                                                    : 'Choose image file'}
+                                                        </span>
+                                                    </div>
+                                                </label>
+                                            </div>
+                                            {(imagePreview || formData.image) && (
+                                                <div className="relative">
+                                                    <img
+                                                        src={imagePreview || getImageUrl(formData.image as string)}
+                                                        alt="Preview"
+                                                        className="w-full h-48 object-cover rounded-lg border border-gray-200"
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        onClick={handleRemoveImage}
+                                                        className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1.5 hover:bg-red-600 transition-colors"
+                                                        title="Remove image"
+                                                    >
+                                                        ×
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <p className="text-sm text-gray-500 mt-2">
+                                            {isEdit 
+                                                ? 'Upload a new image to replace the existing one. Leave empty to keep current image.' 
+                                                : 'Upload an image file for your blog post (required for publishing)'}
+                                        </p>
                                     </div>
 
                                     <div className="md:col-span-2">
