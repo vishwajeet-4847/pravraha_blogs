@@ -87,6 +87,7 @@ export interface BlogFormData {
   ctaLink?: string;
   ctaDesc?: string;
   ctaButtonTitle?: string;
+   seoScripts: string[],
   isPublished: boolean;
 }
 
@@ -151,6 +152,8 @@ export const blogAPI = {
     // Tags - always send as JSON array (can be empty array)
     // Backend expects: Array of strings
     formData.append('tags', JSON.stringify(data.tags || []));
+
+    formData.append('seoScripts',JSON.stringify(data.seoScripts||[]));
     
     // Handle image - only append if it's a File
     // The backend multer expects field name "blogImage"
@@ -217,6 +220,9 @@ export const blogAPI = {
     // Backend expects: Array of strings
     if (data.tags !== undefined) {
       formData.append('tags', JSON.stringify(Array.isArray(data.tags) ? data.tags : []));
+    }
+    if (data.seoScripts !== undefined) {
+      formData.append('seoScripts', JSON.stringify(Array.isArray(data.seoScripts) ? data.seoScripts : []));
     }
     
     // Handle image - only append if it's a File (new upload)

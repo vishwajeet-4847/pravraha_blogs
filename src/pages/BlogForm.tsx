@@ -1,7 +1,7 @@
 import { useState, useEffect, FormEvent } from 'react';
 import Layout from '../components/Layout';
 import { blogAPI, BlogFormData, getImageUrl } from '../utils/api';
-import { Save, Loader2, ArrowLeft, Eye, FileText, Monitor, Edit2, Upload } from 'lucide-react';
+import { Save, Loader2, ArrowLeft, Eye, FileText, Monitor, Edit2, Upload, Trash2, Cross } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import BlogEditor from '../components/BlogEditor';
 import Card, { CardBody } from '../components/ui/Card';
@@ -36,9 +36,11 @@ export default function BlogForm({ blogId }: BlogFormProps) {
         ctaLink: '',
         ctaDesc: '',
         ctaButtonTitle: '',
+        seoScripts: [],
         isPublished: false,
     });
     const [tagInput, setTagInput] = useState('');
+    const [seoInput, setSeoInput] = useState('');
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState<string>('');
     const navigate = useNavigate();
@@ -70,6 +72,7 @@ export default function BlogForm({ blogId }: BlogFormProps) {
                     ctaLink: blog.ctaLink || '',
                     ctaDesc: blog.ctaDesc || '',
                     ctaButtonTitle: blog.ctaButtonTitle || '',
+                    seoScripts: blog.seoScripts || [],
                     isPublished: blog.isPublished,
                 });
                 // Set image preview from existing image
@@ -135,8 +138,8 @@ export default function BlogForm({ blogId }: BlogFormProps) {
         setSaving(true);
 
         try {
-            const dataToSubmit = { 
-                ...formData, 
+            const dataToSubmit = {
+                ...formData,
                 isPublished: publish,
                 // Use imageFile if available, otherwise use existing image string
                 image: imageFile || formData.image
@@ -262,6 +265,7 @@ export default function BlogForm({ blogId }: BlogFormProps) {
                                     )}
                                 </div>
                             </div>
+
 
                             {/* Author Section */}
                             {formData.author.name && (
@@ -469,8 +473,8 @@ export default function BlogForm({ blogId }: BlogFormProps) {
                                                     <div className="flex items-center justify-center gap-2 px-4 py-2.5 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 transition-colors">
                                                         <Upload className="w-5 h-5 text-gray-400" />
                                                         <span className="text-gray-700">
-                                                            {imageFile 
-                                                                ? imageFile.name 
+                                                            {imageFile
+                                                                ? imageFile.name
                                                                 : (formData.image && typeof formData.image === 'string')
                                                                     ? 'Current image (click to change)'
                                                                     : 'Choose image file'}
@@ -497,8 +501,8 @@ export default function BlogForm({ blogId }: BlogFormProps) {
                                             )}
                                         </div>
                                         <p className="text-sm text-gray-500 mt-2">
-                                            {isEdit 
-                                                ? 'Upload a new image to replace the existing one. Leave empty to keep current image.' 
+                                            {isEdit
+                                                ? 'Upload a new image to replace the existing one. Leave empty to keep current image.'
                                                 : 'Upload an image file for your blog post (required for publishing)'}
                                         </p>
                                     </div>
@@ -602,6 +606,123 @@ export default function BlogForm({ blogId }: BlogFormProps) {
                             </CardBody>
                         </Card>
 
+                         <Card>
+           <CardBody>
+  {/* Header */}
+  <div className="flex items-center justify-between mb-2">
+    <h2 className="font-semibold text-lg">
+      SEO Scripts (JSON-LD)
+    </h2>
+
+    <Badge variant="secondary">
+      {formData?.seoScripts?.length || 0} Scripts
+    </Badge>
+  </div>
+
+  {/* Info box */}
+  <div className="mb-4 rounded-md border border-blue-200 bg-blue-50 p-3 text-sm text-blue-800">
+    <p className="font-medium mb-1"> Structured Data for SEO</p>
+    <p>
+      Add <code className="bg-blue-100 px-1 rounded">application/ld+json</code>{' '}
+      scripts only. These are used by Google for rich results
+      (FAQ, Breadcrumbs, Article, etc).
+    </p>
+  </div>
+
+  {/* Textarea */}
+  <label className="block text-sm font-medium mb-1">
+    Paste JSON-LD Script
+  </label>
+
+  <textarea
+    value={seoInput}
+    onChange={(e) => setSeoInput(e.target.value)}
+    placeholder={`<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Your blog title"
+}
+</script>`}
+    className="w-full min-h-[160px] resize-y rounded-md border border-gray-300 bg-white p-3 font-mono text-sm
+               focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+  />
+
+  {/* Actions */}
+  <div className="flex items-center justify-between mt-3">
+    <span className="text-xs text-gray-500">
+      You can add multiple scripts (one per schema)
+    </span>
+
+    <Button
+      type="button"
+      disabled={!seoInput.trim()}
+      onClick={() => {
+        if (!seoInput.trim()) return;
+        setFormData((p) => ({
+          ...p,
+          seoScripts: [...p.seoScripts, seoInput],
+        }));
+        setSeoInput('');
+      }}
+    >
+      + Add Script
+    </Button>
+  </div>
+
+  {/* Empty state */}
+  {(!formData?.seoScripts || formData.seoScripts.length === 0) && (
+    <div className="mt-4 rounded-md border border-dashed p-4 text-center text-sm text-gray-500">
+      No SEO scripts added yet.
+      <br />
+      <span className="text-xs">
+        Example: BlogPosting, FAQPage, BreadcrumbList
+      </span>
+    </div>
+  )}
+
+  {/* Script list */}
+  {formData?.seoScripts?.map((script, i) => (
+    <div
+      key={i}
+      className="mt-4 rounded-md border bg-gray-50 p-3 relative"
+    >
+      {/* Header */}
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-xs font-medium text-gray-600">
+          Script #{i + 1} • JSON-LD
+        </span>
+
+        <button
+          type="button"
+          className="text-red-500 hover:text-red-700"
+          onClick={() =>
+            setFormData((p) => ({
+              ...p,
+              seoScripts: p.seoScripts.filter((_, x) => x !== i),
+            }))
+          }
+        >
+          <Trash2 size={16} />
+        </button>
+      </div>
+
+      {/* Code preview */}
+      <pre className="text-xs max-h-48 overflow-auto whitespace-pre-wrap text-gray-800">
+        {script}
+      </pre>
+    </div>
+  ))}
+
+  {/* Footer hint */}
+  <p className="mt-4 text-xs text-gray-400">
+    <Cross /> These scripts will be injected into the page <code>&lt;head&gt;</code>.
+    Invalid JSON-LD may be ignored by search engines.
+  </p>
+</CardBody>
+            </Card>
+
+
                         <Card>
                             <CardBody>
                                 <h2 className="text-lg font-semibold text-gray-900 mb-6">Call to Action (Optional)</h2>
@@ -655,6 +776,7 @@ export default function BlogForm({ blogId }: BlogFormProps) {
                                 </div>
                             </CardBody>
                         </Card>
+                       
 
                         <Card>
                             <CardBody>
